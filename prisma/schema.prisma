@@ -42,6 +42,7 @@ model Rsvp {
   pickup    PickupSpot @relation(fields: [pickupId], references: [id])
   pickupId  Int
   gameSlot  Int      @default(1)
+  createdAt DateTime @default(now())
 }
 
 model Comment {
