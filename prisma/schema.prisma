@@ -1,0 +1,56 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        Int      @id @default(autoincrement())
+  name      String
+  email     String   @unique
+  password  String
+  createdAt DateTime @default(now())
+
+  rsvps     Rsvp[]
+  comments  Comment[]
+  spots     PickupSpot[] @relation("CreatedSpots")
+}
+
+model PickupSpot {
+  id        Int       @id @default(autoincrement())
+  location  String
+  date      DateTime
+  time      String
+  maxPlayers Int
+  notes     String?
+
+  createdBy User     @relation("CreatedSpots", fields: [createdById], references: [id])
+  createdById Int
+
+  rsvps     Rsvp[]
+  comments  Comment[]
+  created   DateTime  @default(now())
+}
+
+model Rsvp {
+  id        Int      @id @default(autoincrement())
+  user      User     @relation(fields: [userId], references: [id])
+  userId    Int
+  pickup    PickupSpot @relation(fields: [pickupId], references: [id])
+  pickupId  Int
+  gameSlot  Int      @default(1)
+}
+
+model Comment {
+  id        Int      @id @default(autoincrement())
+  text      String
+  createdAt DateTime @default(now())
+
+  user      User     @relation(fields: [userId], references: [id])
+  userId    Int
+  pickup    PickupSpot @relation(fields: [pickupId], references: [id])
+  pickupId  Int
+}
