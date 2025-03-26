@@ -19,7 +19,7 @@ export const register = async(req:Request, res:Response): Promise<void> =>{
     const hashedPassword = await bcrypt.hash(password,10); 
 
     const user = await prisma.user.create({
-      data: {name, email, password},
+      data: {name, email, password: hashedPassword},
     }); 
 
     res.status(201).json({message: "User registered", user : {id:user.id, email:user.email }})
@@ -33,12 +33,18 @@ export const login = async(req:Request, res:Response): Promise<void> =>{
   const {email,password} = req.body; 
 
   try {
-    const user = await prisma.user.findUnique({where: {email}}); 
+    const user = await prisma.user.findUnique({where: {email}});
+    console.log("email:", email);
+    console.log("password:", password);
+    console.log("user from db:", user);
+ 
     if (!user) {
       res.status(401).json({message: "Invalid credentials"}); 
       return; 
     }
     const isMatch = await bcrypt.compare(password, user.password); 
+    console.log("isMatch:", isMatch);
+
 
     if (!isMatch) {
       res.status(401).json({message: "Invalid credentials"}); 
