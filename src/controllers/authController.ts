@@ -22,9 +22,13 @@ export const register = async(req:Request, res:Response): Promise<void> =>{
       data: {name, email, password: hashedPassword},
     }); 
 
-    res.status(201).json({message: "User registered", user : {id:user.id, email:user.email }})
+    const token = jwt.sign({userId: user.id}, JWT_SECRET, {expiresIn: '7d'}); 
+
+    res.status(201).json({message: "User registered", user : {id:user.id, email:user.email },token})
   } catch (err) {
+    console.log("Registration failed", err); 
     res.status(500).json({message: "Registration failed", error: err})
+    
   }
 }; 
 
